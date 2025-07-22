@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EnvironmentCard } from "./EnvironmentCard";
 import { DeploymentHistory } from "./DeploymentHistory";
 import { DeploymentStats } from "./DeploymentStats";
+import { IaCTemplateManager } from "./IaCTemplateManager";
+import { InfrastructureOverview } from "./InfrastructureOverview";
+import { ProvisioningWorkflow } from "./ProvisioningWorkflow";
+import { EnvironmentParameters } from "./EnvironmentParameters";
 import { useToast } from "@/hooks/use-toast";
-import { Server, Settings, Plus, Zap } from "lucide-react";
+import { Server, Settings, Plus, Zap, Code, Monitor, Cog } from "lucide-react";
 
 interface Environment {
   id: string;
@@ -134,8 +139,8 @@ export function HostingDashboard() {
                 <Server className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">DeployHub</h1>
-                <p className="text-sm text-muted-foreground">Automated Web Hosting Solution</p>
+                <h1 className="text-2xl font-bold">DeployHub Pro</h1>
+                <p className="text-sm text-muted-foreground">Infrastructure as Code Platform</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -152,55 +157,103 @@ export function HostingDashboard() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 space-y-8">
-        {/* Stats */}
-        <DeploymentStats />
+      <div className="container mx-auto px-6 py-8">
+        <Tabs defaultValue="overview" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <Monitor className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="infrastructure" className="flex items-center gap-2">
+              <Server className="h-4 w-4" />
+              Infrastructure
+            </TabsTrigger>
+            <TabsTrigger value="provisioning" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Provisioning
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <Code className="h-4 w-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="parameters" className="flex items-center gap-2">
+              <Cog className="h-4 w-4" />
+              Parameters
+            </TabsTrigger>
+            <TabsTrigger value="deployments" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Deployments
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Quick Actions */}
-        <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold">Quick Deploy</h2>
-          <Button 
-            variant="deploy" 
-            size="sm"
-            onClick={() => handleDeploy("2")}
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            Deploy to UAT
-          </Button>
-          <Button 
-            variant="success" 
-            size="sm"
-            onClick={() => handleDeploy("1")}
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            Deploy to Production
-          </Button>
-        </div>
+          <TabsContent value="overview" className="space-y-8">
+            {/* Stats */}
+            <DeploymentStats />
 
-        {/* Environments Grid */}
-        <div>
-          <h2 className="text-xl font-semibold mb-6">Environments</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {environments.map((env) => (
-              <EnvironmentCard
-                key={env.id}
-                name={env.name}
-                type={env.type}
-                status={env.status}
-                version={env.version}
-                lastDeployment={env.lastDeployment}
-                url={env.url}
-                onDeploy={() => handleDeploy(env.id)}
-              />
-            ))}
-          </div>
-        </div>
+            {/* Quick Actions */}
+            <div className="flex items-center gap-4">
+              <h2 className="text-lg font-semibold">Quick Deploy</h2>
+              <Button 
+                variant="deploy" 
+                size="sm"
+                onClick={() => handleDeploy("2")}
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                Deploy to UAT
+              </Button>
+              <Button 
+                variant="success" 
+                size="sm"
+                onClick={() => handleDeploy("1")}
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                Deploy to Production
+              </Button>
+            </div>
 
-        {/* Deployment History */}
-        <DeploymentHistory 
-          deployments={mockDeployments}
-          onRollback={handleRollback}
-        />
+            {/* Environments Grid */}
+            <div>
+              <h2 className="text-xl font-semibold mb-6">Environments</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {environments.map((env) => (
+                  <EnvironmentCard
+                    key={env.id}
+                    name={env.name}
+                    type={env.type}
+                    status={env.status}
+                    version={env.version}
+                    lastDeployment={env.lastDeployment}
+                    url={env.url}
+                    onDeploy={() => handleDeploy(env.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="infrastructure">
+            <InfrastructureOverview />
+          </TabsContent>
+
+          <TabsContent value="provisioning">
+            <ProvisioningWorkflow />
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <IaCTemplateManager />
+          </TabsContent>
+
+          <TabsContent value="parameters">
+            <EnvironmentParameters />
+          </TabsContent>
+
+          <TabsContent value="deployments" className="space-y-8">
+            <DeploymentHistory 
+              deployments={mockDeployments}
+              onRollback={handleRollback}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
